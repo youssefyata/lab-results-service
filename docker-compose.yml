@@ -6,7 +6,7 @@ services:
     container_name: lab-results-ingest-service
     restart: unless-stopped
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/hl7_db?allowPublicKeyRetrieval=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&characterEncoding=utf8
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/hl7_db?allowPublicKeyRetrieval=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&characterEncoding=utf8
       SPRING_DATASOURCE_USERNAME: phpmyadmin
       SPRING_DATASOURCE_PASSWORD: yataPassword@123
       SERVER_PORT: 8089
@@ -15,5 +15,7 @@ services:
       SPACE_ENDPOINT: ${SPACE_ENDPOINT:-https://fra1.digitaloceanspaces.com}
       SPACE_REGION: ${SPACE_REGION:-us-east-1}
       SPACE_BUCKET: ${SPACE_BUCKET:-yata-medias}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "11001:8089"
