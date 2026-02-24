@@ -8,8 +8,6 @@ services:
       MYSQL_USER: phpmyadmin
       MYSQL_PASSWORD: yataPassword@123
       MYSQL_ROOT_PASSWORD: root123
-    ports:
-      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
