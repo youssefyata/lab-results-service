@@ -16,4 +16,4 @@ services:
       SPACE_REGION: ${SPACE_REGION:-us-east-1}
       SPACE_BUCKET: ${SPACE_BUCKET:-yata-medias}
     ports:
-      - "8089:8089"
+      - "11001:8089"
