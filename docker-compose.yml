@@ -1,42 +1,18 @@
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: hl7-mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: hl7_db
-      MYSQL_USER: phpmyadmin
-      MYSQL_PASSWORD: yataPassword@123
-      MYSQL_ROOT_PASSWORD: root123
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123"]
-      interval: 10s
-      timeout: 5s
-      retries: 20
-
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: lab-results-ingest-service
     restart: unless-stopped
-    depends_on:
-      mysql:
-        condition: service_healthy
+    network_mode: host
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/hl7_db?allowPublicKeyRetrieval=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&characterEncoding=utf8
+      SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/lab_ingest?allowPublicKeyRetrieval=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&characterEncoding=utf8
       SPRING_DATASOURCE_USERNAME: phpmyadmin
       SPRING_DATASOURCE_PASSWORD: yataPassword@123
-      SERVER_PORT: 8089
+      SERVER_PORT: 11001
       SPACE_KEY: ${SPACE_KEY:-}
       SPACE_SECRET: ${SPACE_SECRET:-}
       SPACE_ENDPOINT: ${SPACE_ENDPOINT:-https://fra1.digitaloceanspaces.com}
       SPACE_REGION: ${SPACE_REGION:-us-east-1}
       SPACE_BUCKET: ${SPACE_BUCKET:-yata-medias}
-    ports:
-      - "11001:8089"
-
-volumes:
-  mysql_data:

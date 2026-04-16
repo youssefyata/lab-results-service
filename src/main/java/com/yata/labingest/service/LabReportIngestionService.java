@@ -8,45 +8,34 @@ import com.yata.labingest.model.Patient;
 import com.yata.labingest.repository.LabReportRepository;
 import com.yata.labingest.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.ByteArrayInputStream;
 import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class LabReportIngestionService {
 
-    private static final DateTimeFormatter OBJECT_DATE_FORMAT =
-            DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneOffset.UTC);
-
     private final PatientRepository patientRepository;
     private final LabReportRepository labReportRepository;
-    private final StorageService storageService;
-
-    @Value("${SPACE_BUCKET}")
-    private String spaceBucket;
 
     @Transactional
     public LabReportIngestResponse ingest(LabReportIngestRequest request) {
         Patient patient = upsertPatient(request.getPatient());
-        byte[] pdfBytes = decodeBase64(request.getPdfBytesBase64());
+        decodeBase64(request.getPdfBytesBase64());
 
-        String objectName = buildObjectName(request.getReportId(), patient.getPatientExternalId());
-        String storedPdfUrl = storageService.uploadPdf(
-                spaceBucket,
-                objectName,
-                new ByteArrayInputStream(pdfBytes),
-                pdfBytes.length
-        );
+        // TODO: re-enable when Space credentials are configured
+        // String objectName = buildObjectName(request.getReportId(), patient.getPatientExternalId());
+        // String storedPdfUrl = storageService.uploadPdf(
+        //         spaceBucket,
+        //         objectName,
+        //         new ByteArrayInputStream(pdfBytes),
+        //         pdfBytes.length
+        // );
 
         LabReport report = new LabReport();
         report.setReportExternalId(request.getReportId());
@@ -54,7 +43,7 @@ public class LabReportIngestionService {
         report.setPatient(patient);
         report.setSourcePdfPath(request.getPdfPath());
         report.setSourcePdfUrl(request.getPdfUrl());
-        report.setStoredPdfUrl(storedPdfUrl);
+        report.setStoredPdfUrl(null);
         report.setCreatedAt(Instant.now());
 
         request.getResults().forEach(item -> {
@@ -108,11 +97,6 @@ public class LabReportIngestionService {
         } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException("pdf_bytes_base64 is invalid");
         }
-    }
-
-    private String buildObjectName(Long reportId, String patientId) {
-        String datePart = OBJECT_DATE_FORMAT.format(Instant.now());
-        return "lab-reports/" + patientId + "/resultat_" + reportId + "_" + datePart + "_" + UUID.randomUUID() + ".pdf";
     }
 
     private LabReportIngestResponse mapToResponse(LabReport report) {
