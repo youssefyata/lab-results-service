@@ -11,6 +11,7 @@ services:
       SPRING_DATASOURCE_USERNAME: phpmyadmin
       SPRING_DATASOURCE_PASSWORD: yataPassword@123
       SERVER_PORT: 11001
+      LAB_INGEST_API_KEY: api_4f8d2c9a7b1e6f3d8a0c5b2e9f7a1d6c
       SPACE_KEY: ${SPACE_KEY:-}
       SPACE_SECRET: ${SPACE_SECRET:-}
       SPACE_ENDPOINT: ${SPACE_ENDPOINT:-https://fra1.digitaloceanspaces.com}

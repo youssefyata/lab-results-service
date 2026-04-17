@@ -22,6 +22,7 @@ public class LabReportIngestionService {
 
     private final PatientRepository patientRepository;
     private final LabReportRepository labReportRepository;
+    private final SupabaseForwardService supabaseForwardService;
 
     @Transactional
     public LabReportIngestResponse ingest(LabReportIngestRequest request) {
@@ -60,6 +61,9 @@ public class LabReportIngestionService {
         });
 
         LabReport saved = labReportRepository.save(report);
+
+        supabaseForwardService.forward(request);
+
         return mapToResponse(saved);
     }
 
